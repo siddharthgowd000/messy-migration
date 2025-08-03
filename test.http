@@ -1,0 +1,52 @@
+### User Management API Tests
+
+# Base URL
+@baseUrl = http://localhost:5000
+
+### Health Check
+GET {{baseUrl}}/
+Content-Type: application/json
+
+### Get All Users
+GET {{baseUrl}}/users
+Content-Type: application/json
+
+### Search Users
+GET {{baseUrl}}/users/search?q=john
+Content-Type: application/json
+
+### Get User by ID
+GET {{baseUrl}}/users/1
+Content-Type: application/json
+
+### Create New User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123"
+}
+
+### Login User
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+
+### Update User
+PUT {{baseUrl}}/users/1
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+}
+
+### Delete User
+DELETE {{baseUrl}}/users/1
+Content-Type: application/json 

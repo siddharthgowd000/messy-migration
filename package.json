@@ -1,0 +1,23 @@
+{
+  "name": "user-management-system",
+  "version": "1.0.0",
+  "description": "User Management System with MVC Architecture",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDb.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.1",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["express", "mvc", "user-management", "api"],
+  "author": "",
+  "license": "MIT"
+} 
