@@ -1,180 +1,119 @@
-# User Management System - MVC Architecture
+# User Management System - Express.js Version
 
-## 🏗️ Project Structure
+## Overview
+This is a refactored version of the original Flask user management API, migrated to Express.js with significant security and code quality improvements.
 
-```
-src/
-├── config/
-│   └── database.js          # Database configuration and connection
-├── controllers/
-│   └── userController.js    # Business logic and request handling
-├── middleware/
-│   ├── validation.js        # Input validation rules
-│   └── errorHandler.js      # Global error handling
-├── models/
-│   └── User.js             # Data access layer and user operations
-├── routes/
-│   └── userRoutes.js       # Route definitions
-├── utils/
-│   └── responseHandler.js   # Consistent API response utilities
-├── scripts/
-│   └── initDb.js           # Database initialization script
-└── app.js                   # Main application entry point
-```
+## Getting Started
 
-## 🎯 MVC Architecture Benefits
+### Prerequisites
+- Node.js 14+ installed
+- npm or yarn package manager
 
-### **Separation of Concerns**
-- **Models**: Handle data access and business logic
-- **Views**: API responses (JSON)
-- **Controllers**: Handle HTTP requests and coordinate between models and views
-
-### **Code Reusability**
-- Database operations are centralized in models
-- Validation rules are reusable across endpoints
-- Response formatting is consistent through utilities
-
-### **Maintainability**
-- Each component has a single responsibility
-- Easy to add new features without affecting existing code
-- Clear file organization makes debugging easier
-
-## 📁 Detailed Structure
-
-### **Config Layer** (`src/config/`)
-- **database.js**: Centralized database connection management
-- Handles connection, disconnection, and query methods
-- Provides promise-based database operations
-
-### **Models Layer** (`src/models/`)
-- **User.js**: Contains all user-related database operations
-- Static methods for CRUD operations
-- Password hashing and authentication logic
-- Data validation at the model level
-
-### **Controllers Layer** (`src/controllers/`)
-- **userController.js**: Handles HTTP requests and responses
-- Contains business logic for user operations
-- Uses models for data access
-- Returns consistent API responses
-
-### **Routes Layer** (`src/routes/`)
-- **userRoutes.js**: Defines all API endpoints
-- Applies middleware (validation, authentication)
-- Maps HTTP methods to controller methods
-- Clean and organized route definitions
-
-### **Middleware Layer** (`src/middleware/`)
-- **validation.js**: Input validation rules using express-validator
-- **errorHandler.js**: Global error handling and 404 responses
-- Reusable across different routes
-
-### **Utils Layer** (`src/utils/`)
-- **responseHandler.js**: Consistent API response formatting
-- Standardized success and error responses
-- Reduces code duplication
-
-## 🚀 Getting Started
-
-### Installation
+### Setup (Should take < 5 minutes)
 ```bash
+# Install dependencies
 npm install
-```
 
-### Database Setup
-```bash
+# Initialize the database with sample data
 npm run init-db
-```
 
-### Start Development Server
-```bash
-npm run dev
-```
-
-### Start Production Server
-```bash
+# Start the application
 npm start
+
+# For development with auto-restart
+npm run dev
+
+# The API will be available at http://localhost:5000
 ```
 
-## 🔧 Key Features
+## API Endpoints
 
-### **1. Database Abstraction**
-```javascript
-// In models/User.js
-static async findAll() {
-    return await db.query('SELECT id, name, email, created_at FROM users');
+### Health Check
+- `GET /` - Health check endpoint
+
+### User Management
+- `GET /users` - Get all users
+- `GET /user/:id` - Get specific user by ID
+- `POST /users` - Create new user
+- `PUT /user/:id` - Update user
+- `DELETE /user/:id` - Delete user
+
+### Search and Authentication
+- `GET /search?name=<name>` - Search users by name
+- `POST /login` - User login
+
+## Sample Data
+The database is initialized with these sample users:
+- Email: `john@example.com`, Password: `password123`
+- Email: `jane@example.com`, Password: `secret456`
+- Email: `bob@example.com`, Password: `qwerty789`
+
+## Security Improvements
+
+### 1. SQL Injection Prevention
+- All database queries use parameterized statements
+- Input validation and sanitization
+- No direct string concatenation in SQL
+
+### 2. Password Security
+- Passwords are hashed using bcrypt (salt rounds: 10)
+- Secure password comparison
+- Password strength validation (minimum 6 characters)
+
+### 3. Input Validation
+- Email format validation
+- Required field validation
+- User ID type checking
+- Search term validation
+
+### 4. Error Handling
+- Comprehensive error handling with try-catch blocks
+- Proper HTTP status codes
+- Consistent error response format
+- Global error handler
+
+## Response Format
+
+All API responses follow a consistent JSON format:
+
+### Success Response
+```json
+{
+  "success": true,
+  "data": {...},
+  "message": "Operation successful"
 }
 ```
 
-### **2. Consistent Responses**
-```javascript
-// In controllers/userController.js
-return ApiResponse.success(res, { data: users });
-return ApiResponse.error(res, 'Failed to fetch users');
+### Error Response
+```json
+{
+  "error": "Error type",
+  "message": "Detailed error message"
+}
 ```
 
-### **3. Input Validation**
-```javascript
-// In middleware/validation.js
-const userValidation = [
-    body('name').trim().isLength({ min: 1 }),
-    body('email').isEmail(),
-    body('password').isLength({ min: 6 })
-];
+## Testing the API
+
+### Using curl
+
+1. **Get all users:**
+```bash
+curl http://localhost:5000/users
 ```
 
-### **4. Error Handling**
-```javascript
-// Global error handler
-app.use(globalErrorHandler);
-```
-
-## 📊 API Endpoints
-
-| Method | Endpoint | Description | Validation |
-|--------|----------|-------------|------------|
-| GET | `/` | Health check | None |
-| GET | `/users` | Get all users | None |
-| GET | `/user/:id` | Get user by ID | ID validation |
-| POST | `/users` | Create user | User validation |
-| PUT | `/user/:id` | Update user | Update validation |
-| DELETE | `/user/:id` | Delete user | ID validation |
-| GET | `/search?name=term` | Search users | Search validation |
-| POST | `/login` | User login | Login validation |
-
-## 🔒 Security Features
-
-### **1. SQL Injection Prevention**
-- All queries use parameterized statements
-- No string concatenation in SQL
-
-### **2. Password Security**
-- Bcrypt hashing with salt rounds
-- Secure password comparison
-
-### **3. Input Validation**
-- Email format validation
-- Password strength requirements
-- Required field validation
-
-### **4. Error Handling**
-- No sensitive data in error messages
-- Consistent error responses
-
-## 🧪 Testing Examples
-
-### **Create User**
+2. **Create a new user:**
 ```bash
 curl -X POST http://localhost:5000/users \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "Test User",
+    "email": "test@example.com",
     "password": "password123"
   }'
 ```
 
-### **Login**
+3. **Login:**
 ```bash
 curl -X POST http://localhost:5000/login \
   -H "Content-Type: application/json" \
@@ -184,103 +123,67 @@ curl -X POST http://localhost:5000/login \
   }'
 ```
 
-### **Get All Users**
+4. **Search users:**
 ```bash
-curl http://localhost:5000/users
+curl "http://localhost:5000/search?name=John"
 ```
 
-## 🔄 Code Reuse Examples
-
-### **1. Database Operations**
-```javascript
-// Reusable in any model
-const users = await db.query('SELECT * FROM users');
-const user = await db.get('SELECT * FROM users WHERE id = ?', [id]);
+5. **Update user:**
+```bash
+curl -X PUT http://localhost:5000/user/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+  }'
 ```
 
-### **2. Validation Rules**
-```javascript
-// Reusable across endpoints
-app.post('/users', userValidation, handleValidationErrors, controller);
-app.put('/users/:id', updateUserValidation, handleValidationErrors, controller);
+6. **Delete user:**
+```bash
+curl -X DELETE http://localhost:5000/user/1
 ```
 
-### **3. Response Formatting**
-```javascript
-// Consistent responses across all endpoints
-ApiResponse.success(res, { data: result });
-ApiResponse.error(res, 'Error message');
-```
+## Key Features
 
-## 📈 Scalability Benefits
+- **Security First:** All critical security vulnerabilities have been addressed
+- **Input Validation:** Comprehensive validation using express-validator
+- **Error Handling:** Proper error handling with meaningful messages
+- **Password Security:** Secure password hashing and comparison
+- **Database Safety:** Parameterized queries prevent SQL injection
+- **Consistent API:** Standardized response format across all endpoints
+- **Production Ready:** Proper error handling and graceful shutdown
 
-### **1. Easy to Add New Features**
-- Add new models without affecting existing code
-- New controllers can reuse existing utilities
-- Validation rules can be shared
+## Environment Variables
 
-### **2. Easy to Test**
-- Each layer can be tested independently
-- Models can be unit tested
-- Controllers can be integration tested
+- `PORT` - Server port (default: 5000)
+- `NODE_ENV` - Environment (development/production)
 
-### **3. Easy to Maintain**
-- Clear separation of concerns
-- Single responsibility principle
-- Easy to locate and fix issues
+## Dependencies
 
-## 🎨 Best Practices Implemented
+- **express** - Web framework
+- **sqlite3** - Database driver
+- **bcrypt** - Password hashing
+- **express-validator** - Input validation
+- **nodemon** - Development dependency for auto-restart
 
-### **1. Single Responsibility Principle**
-- Each file has one clear purpose
-- Models handle data, controllers handle requests
+## Architecture
 
-### **2. DRY (Don't Repeat Yourself)**
-- Common database operations in config
-- Reusable validation rules
-- Consistent response formatting
+The application follows these architectural principles:
 
-### **3. Separation of Concerns**
-- Business logic in controllers
-- Data access in models
-- Route definitions separate from logic
+1. **Middleware-First:** Validation and error handling through middleware
+2. **Promise-Based:** All database operations use promises
+3. **Security-First:** Multiple layers of security validation
+4. **Consistent API:** Standardized response format and error handling
 
-### **4. Error Handling**
-- Global error handler
-- Consistent error responses
-- Proper HTTP status codes
+## Migration from Flask
 
-## 🔮 Future Enhancements
+This Express.js version addresses all the issues found in the original Flask application:
 
-### **1. Additional Models**
-```javascript
-// Easy to add new models
-// models/Product.js
-// models/Order.js
-// models/Category.js
-```
+- Fixed SQL injection vulnerabilities
+- Implemented proper password hashing
+- Added comprehensive input validation
+- Improved error handling and response format
+- Enhanced security measures
+- Better code organization and maintainability
 
-### **2. Authentication Middleware**
-```javascript
-// middleware/auth.js
-const authenticateToken = (req, res, next) => {
-    // JWT token validation
-};
-```
-
-### **3. Database Migrations**
-```javascript
-// scripts/migrations/
-// 001_create_users_table.js
-// 002_add_user_roles.js
-```
-
-### **4. Testing Structure**
-```javascript
-// tests/
-// ├── unit/
-// ├── integration/
-// └── e2e/
-```
-
-This MVC architecture provides excellent code reuse, maintainability, and scalability while following Node.js and Express.js best practices! 
+For detailed information about all changes made, see `CHANGES.md`. 
